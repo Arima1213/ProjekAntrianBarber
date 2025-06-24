@@ -34,7 +34,6 @@ class StatsHarian extends BaseWidget
         $jumlahSelesai = (clone $query)->where('status', 'selesai')->count();
 
         $pendapatan = (clone $query)
-            ->where('status', 'selesai')
             ->join('produks', 'queues.produk_id', '=', 'produks.id')
             ->sum('produks.harga');
 

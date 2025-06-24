@@ -45,9 +45,6 @@ class SummaryReport extends Page
             $query->where('user_id', Auth::id());
         }
 
-        // Filter hanya tampilkan antrian yang berstatus selesai
-        $query->where('status', 'selesai');
-
         $queues = $query->whereBetween('booking_date', [$from->format('Y-m-d'), $until->format('Y-m-d')])->get();
 
         $summary = [];

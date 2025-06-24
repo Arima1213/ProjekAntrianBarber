@@ -26,8 +26,7 @@ class SummaryExportController extends Controller
 
         // Query antrian
         $query = Queue::with(['user', 'produk'])
-            ->whereBetween('booking_date', [$from->format('Y-m-d'), $until->format('Y-m-d')])
-            ->where('status', 'selesai');
+            ->whereBetween('booking_date', [$from->format('Y-m-d'), $until->format('Y-m-d')]);
 
         if (!Auth::user()->hasRole('super_admin')) {
             $query->where('user_id', Auth::id());
