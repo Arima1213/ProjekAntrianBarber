@@ -44,8 +44,13 @@ class StatsHarian extends BaseWidget
                 ->description('Seluruh antrian'),
             Stat::make('Antrian Selesai', $jumlahSelesai)
                 ->description('Status selesai'),
-            Stat::make('Pendapatan', 'Rp ' . number_format($pendapatan, 0, ',', '.'))
-                ->description('Dari antrian selesai/filter'),
+            // Stat::make('Pendapatan', 'Rp ' . number_format($pendapatan, 0, ',', '.'))
+            //     ->description('Dari antrian selesai/filter'),
         ];
+    }
+
+    protected function getColumns(): int
+    {
+        return 2; // masing-masing stat akan ambil 6 kolom dari 12
     }
 }

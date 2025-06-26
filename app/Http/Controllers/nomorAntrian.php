@@ -24,7 +24,7 @@ class nomorAntrian extends Controller
             ->whereDate('booking_date', today())
             ->where('tenant_id', $id)
             ->where('status', 'menunggu')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at')
             ->get();
 
         if ($queues->isEmpty()) {
