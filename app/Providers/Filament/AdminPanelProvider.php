@@ -36,7 +36,6 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->spa()
             ->databaseNotifications()
-            ->emailVerification()
             ->profile()
             ->passwordReset()
             ->login()
