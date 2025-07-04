@@ -69,7 +69,6 @@ class ListUserQueues extends ListRecords
 
                     Queue::create([
                         'customer_id' => $customer->id,
-                        'user_id' => $user->id,
                         'tenant_id' => $tenantId,
                         'produk_id' => $data['produk_id'],
                         'booking_date' => $bookingDate,

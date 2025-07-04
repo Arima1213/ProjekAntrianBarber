@@ -93,7 +93,8 @@ class QueueResource extends Resource
                     ->label('Chapster yang Melayani')
                     ->options(fn() => \App\Models\User::pluck('name', 'id'))
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    ->disabled(),  // Membuat field ini tidak bisa diedit
 
                 DatePicker::make('booking_date')
                     ->label('Tanggal Booking')
@@ -159,7 +160,6 @@ class QueueResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                // filter antrian hari ini
                 Filter::make('today')
                     ->label('Antrian Hari Ini')
                     ->default(true)

@@ -57,18 +57,27 @@
 <body>
 	<div class="center-container">
 		<div class="judul">Nomor Antrian {{ $cabang->name }}</div>
-		<div id="nomor-antrian" class="nomor-antrian">-</div>
+		<div class="text-center">
+			<h1 class="fw-bold">Jumlah Antrian Menunggu</h1>
+		</div>
+		<div id="jumlah-antrian-menunggu" class="nomor-antrian">-</div>
 		<div class="tanggal" id="tanggal"></div>
 		<div class="alamat">
 			{{ $cabang->lokasi->first()->alamat ?? '-' }}
 		</div>
+		{{-- <div class="jumlah-antrian">
+            Jumlah Antrian Menunggu: <span id="jumlah-antrian-menunggu">-</span>
+        </div> --}}
+
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 	<script>
 		function tampilkanTanggal() {
 			const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-			const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+			const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September',
+				'Oktober', 'November', 'Desember'
+			];
 			const t = new Date();
 			const teksTanggal = `${hari[t.getDay()]}, ${t.getDate()} ${bulan[t.getMonth()]} ${t.getFullYear()}`;
 			$('#tanggal').text(teksTanggal);
@@ -79,15 +88,24 @@
 				url: "{{ route('antrian.today.json', ['id' => $cabang->id]) }}",
 				method: "GET",
 				success: function(data) {
-					if (data.length > 0) {
-						const terakhir = data[data.length - 1];
+					// console.log(data); // Debug log untuk melihat data yang diterima
+					if (data.queues.length > 0) {
+						const terakhir = data.queues[data.queues.length - 1];
 						$('#nomor-antrian').text(terakhir.nomor_antrian);
 					} else {
 						$('#nomor-antrian').text('-');
 					}
+
+					// Pastikan menungguCount ada dan tampilkan di HTML
+					if (data.menungguCount !== undefined) {
+						$('#jumlah-antrian-menunggu').text(data.menungguCount);
+					} else {
+						$('#jumlah-antrian-menunggu').text('Error');
+					}
 				},
 				error: function() {
 					$('#nomor-antrian').text('Error');
+					$('#jumlah-antrian-menunggu').text('Error');
 				}
 			});
 		}
