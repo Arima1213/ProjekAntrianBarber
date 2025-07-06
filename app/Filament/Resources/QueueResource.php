@@ -27,8 +27,10 @@ use App\Filament\Resources\QueueResource\Pages\ListQueues;
 use App\Filament\Resources\QueueResource\Pages\CreateQueue;
 use App\Models\Customer;
 use App\Models\User;
+use Filament\Actions\Exports\ExportColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
+use Filament\Tables\Actions\ExportBulkAction;
 
 class QueueResource extends Resource
 {
@@ -127,9 +129,13 @@ class QueueResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                // Tables\Columns\TextColumn::make('customer.nama')
-                //     ->label('Pelanggan')
-                //     ->searchable(),
+                Tables\Columns\TextColumn::make('customer.nama')
+                    ->label('Nama Customer')
+                    ->searchable()
+                    ->getStateUsing(function ($record) {
+                        return $record->customer ? $record->customer->nama : '-';
+                    }),
+
                 Tables\Columns\TextColumn::make('produk.judul')
                     ->label('Produk')
                     ->sortable(),
@@ -200,7 +206,8 @@ class QueueResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                //action untuk print struk
+
+                // action untuk print struk
                 Tables\Actions\Action::make('print_struk')
                     ->label('Print Struk')
                     ->action(function (Queue $record) {
@@ -210,6 +217,7 @@ class QueueResource extends Resource
                     ->openUrlInNewTab()
                     ->color('primary')
                     ->disabled(fn(Queue $record) => $record->status === 'selesai'),
+
                 // action to validate the queue
                 Tables\Actions\Action::make('validate')
                     ->label('Validate')
@@ -220,7 +228,8 @@ class QueueResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->disabled(fn(Queue $record) => $record->is_validated || $record->status === 'batal'),
-                // action selesai
+
+                // action selesai with conditions
                 Tables\Actions\Action::make('selesai')
                     ->label('Selesai')
                     ->action(function (Queue $record) {
@@ -236,11 +245,14 @@ class QueueResource extends Resource
                         fn(Queue $record) =>
                         !$record->is_validated ||
                             $record->status === 'selesai' ||
-                            $record->status === 'batal'
+                            $record->status === 'batal' ||
+                            Auth::user()?->hasRole('super_admin') ||
+                            Auth::user()?->teams->first()?->id === 1 // Check if the user is from 'cabang 001'
                     ),
+
                 // action batalkan
                 Tables\Actions\Action::make('batalkan')
-                    ->label('cancel')
+                    ->label('Cancel')
                     ->action(function (Queue $record) {
                         $record->update(['status' => 'batal']);
                     })
@@ -257,6 +269,21 @@ class QueueResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->label('Export Antrian Terpilih')
+                        ->exportColumns([
+                            ExportColumn::make('id')->label('ID'),
+                            ExportColumn::make('customer.nama')->label('Nama Customer'),
+                            ExportColumn::make('produk.judul')->label('Produk'),
+                            ExportColumn::make('nomor_antrian')->label('Nomor Antrian'),
+                            ExportColumn::make('status')->label('Status'),
+                            ExportColumn::make('is_validated')->label('Tervalidasi'),
+                            ExportColumn::make('user.name')->label('Chapster'),
+                            ExportColumn::make('booking_date')->label('Tanggal Booking'),
+                            ExportColumn::make('created_at')->label('Dibuat Pada'),
+                        ])
+                        ->fileName(fn() => 'export-antrian-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+
                 ]),
             ]);
     }
