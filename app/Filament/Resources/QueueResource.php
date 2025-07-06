@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\QueueExporter;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Queue;
@@ -270,19 +271,8 @@ class QueueResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     ExportBulkAction::make()
-                        ->label('Export Antrian Terpilih')
-                        ->exportColumns([
-                            ExportColumn::make('id')->label('ID'),
-                            ExportColumn::make('customer.nama')->label('Nama Customer'),
-                            ExportColumn::make('produk.judul')->label('Produk'),
-                            ExportColumn::make('nomor_antrian')->label('Nomor Antrian'),
-                            ExportColumn::make('status')->label('Status'),
-                            ExportColumn::make('is_validated')->label('Tervalidasi'),
-                            ExportColumn::make('user.name')->label('Chapster'),
-                            ExportColumn::make('booking_date')->label('Tanggal Booking'),
-                            ExportColumn::make('created_at')->label('Dibuat Pada'),
-                        ])
-                        ->fileName(fn() => 'export-antrian-' . now()->format('Y-m-d-H-i-s') . '.xlsx'),
+                        ->label('Export Data')
+                        ->exporter(QueueExporter::class),
 
                 ]),
             ]);
