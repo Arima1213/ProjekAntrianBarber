@@ -24,7 +24,8 @@ class GrafikPemasukanPerbulan extends ChartWidget
         $filters = $this->filters ?? [];
         $query = Queue::query()
             ->join('produks', 'queues.produk_id', '=', 'produks.id')
-            ->where('queues.status', 'selesai');
+            ->where('queues.status', 'selesai')
+            ->where('queues.is_validated', true);
 
         // Filter tenant jika ada
         if (!empty($filters['tenant_id'])) {

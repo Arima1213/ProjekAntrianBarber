@@ -34,7 +34,6 @@ class ExportController extends Controller
             $query->latest();
         }
 
-        dd($query->toSql(), $query->getBindings());
         $queues = $query->get();
 
         // Gunakan PhpSpreadsheet untuk membuat file Excel

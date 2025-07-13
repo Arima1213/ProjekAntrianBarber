@@ -57,15 +57,35 @@ class ListUserQueues extends ListRecords
                         ]);
                     }
 
-                    $bookingDate = $data['booking_date'];
                     $tenantId = $data['tenant_id'];
+                    $produkId = $data['produk_id'];
+                    $bookingDate = $data['booking_date'];
+                    // // Nomor antrian dihitung per tenant (cabang) dan tanggal booking
+                    // $lastQueue = Queue::where('tenant_id', $tenantId)
+                    //     ->whereDate('booking_date', $bookingDate)
+                    //     ->orderByDesc('nomor_antrian')
+                    //     ->first();
+                    // $nextNomorAntrian = $lastQueue ? $lastQueue->nomor_antrian + 1 : 1;
 
-                    // Nomor antrian dihitung per tenant (cabang) dan tanggal booking
-                    $lastQueue = Queue::where('tenant_id', $tenantId)
-                        ->whereDate('booking_date', $bookingDate)
-                        ->orderByDesc('nomor_antrian')
-                        ->first();
-                    $nextNomorAntrian = $lastQueue ? $lastQueue->nomor_antrian + 1 : 1;
+                    if ($tenantId == 4) {
+
+                        $lastQueue = Queue::where('tenant_id', $tenantId)
+                            ->where('produk_id', $produkId)
+                            ->whereDate('booking_date', $bookingDate)
+                            ->orderByDesc('nomor_antrian')
+                            ->first();
+
+                        $nextNomorAntrian = $lastQueue ? $lastQueue->nomor_antrian + 1 : 1;
+                    } else {
+
+                        $lastQueue = Queue::where('tenant_id', $tenantId)
+                            ->where('produk_id', $produkId)
+                            ->whereDate('booking_date', $bookingDate)
+                            ->orderByDesc('nomor_antrian')
+                            ->first();
+
+                        $nextNomorAntrian = $lastQueue ? $lastQueue->nomor_antrian + 1 : 1;
+                    }
 
                     Queue::create([
                         'customer_id' => $customer->id,
