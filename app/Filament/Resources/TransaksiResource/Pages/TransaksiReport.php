@@ -41,6 +41,9 @@ class TransaksiReport extends Page
             $query->where('tenant_id', $this->tenant_id);
         }
 
+        // Hanya ambil data yang isvalidated = true
+        $query->where('is_validated', true);
+
         return $query
             ->whereBetween('booking_date', [$from->toDateString(), $until->subDay()->toDateString()])
             ->orderBy('booking_date', 'asc')

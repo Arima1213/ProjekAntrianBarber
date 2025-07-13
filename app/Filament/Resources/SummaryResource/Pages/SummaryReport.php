@@ -49,6 +49,8 @@ class SummaryReport extends Page
             $query->where('user_id', Auth::id());
         }
 
+        $query->where('is_validated', true);
+
         // Filter berdasarkan tenant jika super admin memilih tenant
         if ($this->tenant_id) {
             $query->where('tenant_id', $this->tenant_id);

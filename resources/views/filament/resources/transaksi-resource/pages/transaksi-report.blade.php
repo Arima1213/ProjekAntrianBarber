@@ -20,9 +20,9 @@
 			<div class="flex items-end gap-3">
 				<x-filament::button type="submit" class="w-full md:w-auto">Tampilkan</x-filament::button>
 				<x-filament::button tag="a"
-					href="{{ route('transaksi.export.pdf', ['from' => $from, 'until' => $until, 'tenant_id' => $tenant_id ?? null]) }}" target="_blank"
+					href="{{ route('transaksi.export.excel', ['from' => $from, 'until' => $until, 'tenant_id' => $tenant_id ?? null]) }}" target="_blank"
 					color="gray" class="w-full md:w-auto">
-					PDF
+					EXCEl
 				</x-filament::button>
 			</div>
 		</div>

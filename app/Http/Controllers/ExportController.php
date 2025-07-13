@@ -27,6 +27,8 @@ class ExportController extends Controller
             $query->whereDate('booking_date', request('booking_date'));
         }
 
+        $query->where('is_validated', true);
+
         // SORTING
         if (request()->has('sortColumn') && request()->has('sortDirection')) {
             $query->orderBy(request('sortColumn'), request('sortDirection'));

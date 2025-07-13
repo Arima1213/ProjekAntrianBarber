@@ -14,9 +14,9 @@ class TransaksiExportController extends Controller
     {
         $from = Carbon::parse($request->input('from'))->startOfDay();
         $until = Carbon::parse($request->input('until'))->startOfDay();
-
         $data = Queue::with(['user', 'produk', 'customer'])
             ->whereBetween('booking_date', [$from->toDateString(), $until->subDay()->toDateString()])
+            ->where('is_validated', true)
             ->orderBy('booking_date', 'asc')
             ->get();
 

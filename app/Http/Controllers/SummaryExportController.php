@@ -32,6 +32,8 @@ class SummaryExportController extends Controller
             $query->where('user_id', Auth::id());
         }
 
+        $query->where('is_validated', true);
+
         $queues = $query->get();
 
         // Ringkasan

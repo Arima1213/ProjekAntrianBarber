@@ -23,9 +23,9 @@
 					Tampilkan
 				</x-filament::button>
 				<x-filament::button tag="a"
-					href="{{ route('summary.export.pdf', ['from' => $from, 'until' => $until, 'tenant_id' => $tenant_id ?? null]) }}" target="_blank" color="gray"
-					class="w-full md:w-auto">
-					PDF
+					href="{{ route('summary.export.excel', ['from' => $from, 'until' => $until, 'tenant_id' => $tenant_id ?? null]) }}" target="_blank"
+					color="gray" class="w-full md:w-auto">
+					EXCEl
 				</x-filament::button>
 			</div>
 		</div>
