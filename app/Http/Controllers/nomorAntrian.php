@@ -51,18 +51,14 @@ class nomorAntrian extends Controller
     // }
     public function jsonToday($id)
     {
-        // Ambil antrian sesuai tanggal, tenant, dan status
+        // Ambil semua antrian status menunggu hari ini berdasarkan tenant
         $queues = Queue::with(['customer', 'produk'])
             ->whereDate('booking_date', today())
             ->where('tenant_id', $id)
             ->where('status', 'menunggu')
             ->orderBy('created_at', 'desc');
 
-        if ($id == 1) {
-            $queues = $queues->whereHas('produk', function ($query) {
-                $query->where('judul', 'like', '%Potong 20k%');
-            });
-        } elseif ($id == 4) {
+        if ($id == 1 || $id == 4) {
             $queues = $queues->whereHas('produk', function ($query) {
                 $query->where('judul', 'like', '%Potong 20k%');
             });
@@ -72,12 +68,37 @@ class nomorAntrian extends Controller
 
         $menungguCount = $queues->count();
 
+        // Ambil antrian terakhir yang selesai
+        $lastFinished = Queue::whereDate('booking_date', today())
+            ->where('tenant_id', $id)
+            ->where('status', 'selesai')
+            ->orderByDesc('updated_at')
+            ->first();
+
+        // Ambil antrian setelah antrian terakhir yang selesai
+        $sedangDilayani = null;
+        if ($lastFinished) {
+            $sedangDilayani = Queue::whereDate('booking_date', today())
+                ->where('tenant_id', $id)
+                ->where('status', 'menunggu')
+                ->where('nomor_antrian', '>', $lastFinished->nomor_antrian)
+                ->orderBy('nomor_antrian') // ambil nomor antrian terdekat setelah yang selesai
+                ->first();
+        } else {
+            // Jika tidak ada lastFinished, ambil antrian pertama yang menunggu
+            $sedangDilayani = Queue::whereDate('booking_date', today())
+                ->where('tenant_id', $id)
+                ->where('status', 'menunggu')
+                ->orderBy('nomor_antrian')
+                ->first();
+        }
+
         return response()->json([
             'queues' => $queues,
             'menungguCount' => $menungguCount,
+            'sedangDilayani' => $sedangDilayani, // tambahan: antrian yang sedang dilayani
         ]);
     }
-
 
 
     public function print($id)

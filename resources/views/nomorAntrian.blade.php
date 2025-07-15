@@ -53,11 +53,40 @@
 			/* margin-top: 1vw; */
 			color: #ccc;
 		}
+
+		#sedang-dilayani-wrapper {
+			position: absolute;
+			top: 45%;
+			right: 10%;
+			transform: translateY(-50%);
+			text-align: right;
+			font-size: 22px;
+			color: #fff;
+			z-index: 10;
+		}
+
+		#sedang-dilayani-wrapper .label {
+			font-size: 24px;
+			font-weight: normal;
+			color: #ccc;
+		}
+
+		#sedang-dilayani-wrapper .value {
+			font-size: 48px;
+			font-weight: bold;
+			color: #fff;
+		}
 	</style>
 </head>
 
 <body>
 	<div class="center-container">
+		<!-- Nomor Antrian Sedang Dilayani (absolute) -->
+		<div id="sedang-dilayani-wrapper">
+			<div class="label">Sedang Dilayani</div>
+			<div id="sedang-dilayani" class="value">-</div>
+		</div>
+
 		<div class="judul">Nomor Antrian {{ $cabang->name }}</div>
 		<div class="text-center" style="font-size: 130px;">
 			<h1 class="fw-bold">Jumlah Antrian Menunggu</h1>
@@ -96,6 +125,20 @@
 				url: "{{ route('antrian.today.json', ['id' => $cabang->id]) }}",
 				method: "GET",
 				success: function(data) {
+					// Menampilkan jumlah menunggu
+					if (data.menungguCount !== undefined) {
+						$('#jumlah-antrian-menunggu').text(data.menungguCount);
+					} else {
+						$('#jumlah-antrian-menunggu').text('Error');
+					}
+
+					// Menampilkan nomor antrian sedang dilayani
+					if (data.sedangDilayani !== null) {
+						$('#sedang-dilayani').text(data.sedangDilayani.nomor_antrian);
+					} else {
+						$('#sedang-dilayani').text('-');
+					}
+
 					// console.log(data); // Debug log untuk melihat data yang diterima
 					if (data.queues.length > 0) {
 						const terakhir = data.queues[data.queues.length - 1];

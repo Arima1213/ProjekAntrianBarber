@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Exports\QueueExporter;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Queue;
@@ -28,10 +27,8 @@ use App\Filament\Resources\QueueResource\Pages\ListQueues;
 use App\Filament\Resources\QueueResource\Pages\CreateQueue;
 use App\Models\Customer;
 use App\Models\User;
-use Filament\Actions\Exports\ExportColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Get;
-use Filament\Tables\Actions\ExportBulkAction;
 
 class QueueResource extends Resource
 {
@@ -231,6 +228,25 @@ class QueueResource extends Resource
                     ->disabled(fn(Queue $record) => $record->is_validated || $record->status === 'batal'),
 
                 // action selesai with conditions
+                // Tables\Actions\Action::make('selesai')
+                //     ->label('Selesai')
+                //     ->action(function (Queue $record) {
+                //         $record->update([
+                //             'status' => 'selesai',
+                //             'user_id' => Auth::user()?->id,
+                //         ]);
+                //     })
+                //     ->requiresConfirmation()
+                //     ->icon('heroicon-o-check')
+                //     ->color('success')
+                //     ->disabled(
+                //         fn(Queue $record) =>
+                //         !$record->is_validated ||
+                //             $record->status === 'selesai' ||
+                //             $record->status === 'batal' ||
+                //             Auth::user()?->hasRole('super_admin') ||
+                //             Auth::user()?->teams->first()?->id === 1
+                //     ),
                 Tables\Actions\Action::make('selesai')
                     ->label('Selesai')
                     ->action(function (Queue $record) {
@@ -242,14 +258,8 @@ class QueueResource extends Resource
                     ->requiresConfirmation()
                     ->icon('heroicon-o-check')
                     ->color('success')
-                    ->disabled(
-                        fn(Queue $record) =>
-                        !$record->is_validated ||
-                            $record->status === 'selesai' ||
-                            $record->status === 'batal' ||
-                            Auth::user()?->hasRole('super_admin') ||
-                            Auth::user()?->teams->first()?->id === 1 // Check if the user is from 'cabang 001'
-                    ),
+                    ->visible(fn() => Auth::user()?->hasRole('super_admin')),
+
 
                 // action batalkan
                 Tables\Actions\Action::make('batalkan')
@@ -264,16 +274,24 @@ class QueueResource extends Resource
                         fn(Queue $record) =>
                         !$record->is_validated ||
                             $record->status === 'batal' ||
-                            $record->status === 'selesai'
+                            $record->status === 'selesai' ||
+                            Auth::user()?->hasRole('chapster') // Menambahkan pengecekan jika pengguna adalah Chapster
                     ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make()
-                        ->label('Export Data')
-                        ->exporter(QueueExporter::class),
+                    Tables\Actions\Action::make('bulk_print')
+                        ->label('Bulk Print')
+                        ->action(function (array $records) {
+                            // Ensure that $records contains the selected queues
+                            $recordIds = collect($records)->pluck('id')->toArray(); // Get the IDs of the selected queues
 
+                            // Redirect to the bulk print route with the selected queue IDs
+                            return redirect()->route('antrian.bulk_print', ['queues' => $recordIds]);
+                        })
+                        ->icon('heroicon-o-printer')
+                        ->color('primary'),
                 ]),
             ]);
     }
